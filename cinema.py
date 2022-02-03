@@ -25,5 +25,44 @@ python cinema.py --format [ CSV | HTML ]
 
 """
 
+import requests
+import sys
+from bs4 import BeautifulSoup
+import pandas as pd
+
+
 def transform():
-  pass
+    
+    titles=[]
+    years = []
+    rankings   = [] 
+    nb_votes = []
+
+    "il faut looper sur les 3 onglets du site, pas eu le temps"
+
+    url = "https://www.listchallenges.com/100-must-see-movies-for-more-advanced-cinephiles"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
+    elements = soup.find_all('div', {"class" : "list-item view-small-image"})
+
+    for element in elements:
+        title = element.find_all('div', {'class' : 'item-name'})[0].text
+        title = title.replace("\t","")
+        title = title.replace("\r","")
+        title = title.replace("\n","")
+        date = title[-5:-1]
+    
+    
+        titles.append(title[:len(title)-7])
+        years.append(date)
+    
+
+    df = pd.DataFrame.from_dict({ 'Title' : titles,
+                            'Year'  : years,
+                            })
+
+    df.to_csv('films.csv',index=False)
+
+
+    
+     pass
